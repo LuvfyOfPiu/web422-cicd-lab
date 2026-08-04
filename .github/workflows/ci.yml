@@ -1,0 +1,35 @@
+name: CI
+
+on:
+  push:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out your code onto the runner
+        uses: actions/checkout@v4
+
+      - name: Install Node 20, with npm caching
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies from the lock file
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Unit tests
+        run: npm run test:ci
+
+      - name: End-to-end tests
+        uses: cypress-io/github-action@v6
+        with:
+          install: false
+          build: npm run build
+          start: npm start
+          wait-on: http://localhost:3000
